@@ -2,8 +2,30 @@ import React, { useState } from 'react'
 import Authors from './components/Authors'
 import Books from './components/Books'
 import NewBook from './components/NewBook'
+import { Mutation } from 'react-apollo'
+import { gql } from 'apollo-boost'
 
-const App = () => {
+
+const ADD_BOOK = gql`
+mutation addBook($title: String!, $author: String!, $published: Int!, $genres: [String!]!) {
+  addBook(
+    title: $title,
+    author: $author,
+    published: $published,
+    genres: $genres
+  ) {
+    title
+    author
+    published
+    genres
+    id 
+  }
+}
+`
+
+
+
+const App = ({ result }) => {
   const [page, setPage] = useState('authors')
 
   return (
@@ -15,6 +37,7 @@ const App = () => {
       </div>
 
       <Authors
+        result={result}
         show={page === 'authors'}
       />
 
@@ -22,9 +45,14 @@ const App = () => {
         show={page === 'books'}
       />
 
-      <NewBook
-        show={page === 'add'}
-      />
+      <Mutation mutation={ADD_BOOK}>
+        {(addBook) =>
+          <NewBook
+            addBook={addBook}
+            show={page === 'add'}
+          />
+        }
+      </Mutation>
 
     </div>
   )
